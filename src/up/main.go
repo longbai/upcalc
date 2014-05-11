@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"sort"
 	"time"
+
+	hum "github.com/dustin/go-humanize"
 )
 
 type Log struct {
@@ -18,6 +20,7 @@ type Log struct {
 type TransferRec struct {
 	Time     int64
 	Transfer int64
+	Count    int64
 }
 
 var zone *time.Location = time.FixedZone("CST", 8*3600)
@@ -40,7 +43,7 @@ func (t *TransferRec) Bandwidth() int64 {
 }
 
 func (t *TransferRec) print() {
-	fmt.Println(t.Time, t.timeString(), t.Bandwidth())
+	fmt.Println(t.Time, t.timeString(), "times", t.Count, "bandwidth", hum.Comma(t.Bandwidth()), hum.Bytes(uint64(t.Bandwidth())))
 }
 
 type TransferArray []TransferRec
@@ -88,16 +91,22 @@ func main() {
 		}
 		index := (t - startUnix) / interval
 		recs[index].Transfer += v.Length
+		recs[index].Count++
 		total += v.Length
 	}
 	TransferArray(recs).Sort()
+
 	pos := int(float32(pointNumber) * 0.95)
-	fmt.Print(pos, " ")
+	fmt.Print("95%", pos, " ")
 	recs[pos].print()
 
-	fmt.Print(pos+1, " ")
-	recs[pos+1].print()
-	fmt.Print(pointNumber, " ")
-	recs[pointNumber-1].print()
-	fmt.Println("total upload bytes", total)
+	pos = pointNumber - 4
+	fmt.Print("4th", pos, " ")
+	recs[pos].print()
+
+	pos = pointNumber - 1
+	fmt.Print("max", pos, " ")
+	recs[pos].print()
+
+	fmt.Println("total upload bytes", hum.Comma(total), hum.Bytes(uint64(total)))
 }

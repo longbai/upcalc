@@ -26,3 +26,6 @@ _testmain.go
 
 bin/
 pkg/
+
+# ignore go api, down from github
+src/github.com/dustin

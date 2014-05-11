@@ -26,11 +26,13 @@ type body struct {
 
 func parseLog(line string) (log Log, err error) {
 	rec := strings.Split(line, "\t")
-	status := rec[7]
-	if status != "200" {
-		err = invalid
-		return
-	}
+	// status := rec[7]
+	// if status != "200" || status != "614"{
+	// 	err = invalid
+	// 	fmt.Println(status)
+	// 	totalInvalid++
+	// 	return
+	// }
 	log.Time, err = strconv.ParseInt(rec[2], 10, 64)
 	if err != nil {
 		return
@@ -102,5 +104,4 @@ func main() {
 	}
 	d, _ := json.MarshalIndent(logs, "", "")
 	ioutil.WriteFile(*out, d, 0666)
-
 }
